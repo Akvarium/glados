@@ -56,19 +56,36 @@ class wall():
 
     return out 
 
+  def get_ns(self,data):
+    ver = self.get_IPv(data)
+    out = ''
+    try:
+      if ver > 0: return scheck('host %s' %data).split()[-1]  
+      elif ver == -1:
+        for line in scheck('host %s' %data).split('\n'):
+	  if line and not 'mail' in line: out += line.split()[-1]+' ' 
+    except Exception, e: print e 
+    return out.split()
+
+  def add_client_from_ns(self,address):
+    for ip in self.get_ns(address):
+      self.add_client(ip)
+
 
 
 
 
 wall = wall()
 
-print wall.get_rules(6)
-print wall.get_rules(4) 
-time.sleep(2)
+print wall.get_ns('steikje')
 
-wall.add_custom('-I INPUT -d fe34:1:39::1 -j DROP')
+wall.add_client_from_ns('steikje')
 
+#print wall.get_rules(6)
+#print wall.get_rules(4) 
+#time.sleep(2)
+#wall.add_custom('-I INPUT -d fe34:1:39::1 -j DROP')
 #wall.del_client('10.0.0.1')
 #wall.del_client('fe33::1')
-wall.add_client('10.0.0.1')
-wall.add_client('fe33::1')
+#wall.add_client('10.0.0.1')
+#wall.add_client('fe33::1')
