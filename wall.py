@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 import sys, time, ipaddr, os, shutil
 from functools import  partial
 from subprocess import call, check_output
@@ -11,13 +10,18 @@ class wall():
 
 
 
-  def add_client(self,ip):
+  def add_client(self,ip,user):
     ver = self.get_IPv(ip)
     self.del_client(ip)
     for way in ['-d','-s']:
-      command = '-A FORWARD %s %s -j ACCEPT' %(way,ip)
-      if ver == 4: scall('/sbin/iptables %s' %command)
-      elif ver == 6: scall('/sbin/ip6tables %s'%command)
+      command = '-A ALLOWED %s %s -j ACCEPT -m comment --comment %s' %(way,ip,user)
+      if ver == 4: 
+        scall('/sbin/iptables %s' %command)
+        scall('/sbin/iptables -t nat %s' %command)
+      elif ver == 6: 
+        scall('/sbin/ip6tables %s'%command)
+        scall('/sbin/ip6tables -t nat %s'%command)
+      scall("iptables-save > /var/www/html/active")
 
   def add_custom(self,rule):
     for word in rule.split():
@@ -39,8 +43,14 @@ class wall():
     for rule in self.get_rules(ver):
       if ip in rule: 
         command = rule.replace('-A','-D')
-	if ver == 4: scall('/sbin/iptables %s' %command)
-        elif ver == 6: scall('/sbin/ip6tables %s' %command)
+        if ver == 4: 
+          scall('/sbin/iptables %s' %command)
+          scall('/sbin/iptables -t nat %s' %command)
+        elif ver == 6: 
+          scall('/sbin/ip6tables %s'%command)
+          scall('/sbin/ip6tables -t nat %s'%command)
+
+        scall("iptables-save > /var/www/html/active")
       
 
   def get_rules(self,ver):	
@@ -48,8 +58,9 @@ class wall():
     rules = '' 
     if ver == 4: rules = scheck("/sbin/iptables-save")
     elif ver == 6: rules = scheck("/sbin/ip6tables-save")
+    rules = rules.split('*filter')[1]
     for rules in rules.split('\n'):
-      if 'FORWARD' in rules and not '[0:0]' in rules: out += rules+"; "
+      if 'ALLOWED' in rules and not '[0:0]' in rules: out += rules+"; "
  
     out = out.split(';')
     out = out[:len(out)-1]
@@ -74,18 +85,4 @@ class wall():
 
 
 
-
 wall = wall()
-
-print wall.get_ns('steikje')
-
-wall.add_client_from_ns('steikje')
-
-#print wall.get_rules(6)
-#print wall.get_rules(4) 
-#time.sleep(2)
-#wall.add_custom('-I INPUT -d fe34:1:39::1 -j DROP')
-#wall.del_client('10.0.0.1')
-#wall.del_client('fe33::1')
-#wall.add_client('10.0.0.1')
-#wall.add_client('fe33::1')

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+killall tower.py 
+
+iptables-save > /var/www/html/active
+
+screen tower.py
+

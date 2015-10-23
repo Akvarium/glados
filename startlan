@@ -1,0 +1,24 @@
+#!/bin/bash
+
+killall tower.py 
+
+iptables -F
+iptables -t nat -F
+iptables -N ALLOWED
+iptables -t nat -N ALLOWED
+iptables -F ALLOWED
+iptables -t nat -F ALLOWED
+iptables -A FORWARD -p tcp --syn -m connlimit --connlimit-above 1000 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
+iptables -A FORWARD -p udp -m multiport --ports 53 -j ACCEPT
+iptables -A FORWARD -j ALLOWED
+iptables -t nat -A PREROUTING -j ALLOWED
+iptables -t nat -A PREROUTING -p tcp -m multiport --ports 80,443 -j DNAT --to-destination 158.38.183.129:80
+iptables -A FORWARD -d 158.38.183.129 -p tcp -m multiport --ports 80,443 -j ACCEPT
+iptables -A FORWARD -j DROP
+
+#iptables -A POSTROUTING -t nat -o eth1:1 -j MASQUERADE
+
+iptables-save > /var/www/html/active
+
+screen tower.py
+
