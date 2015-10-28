@@ -7,7 +7,8 @@ scall = partial(call, shell=True)
 scheck = partial(check_output, shell=True)
 
 class wall():
-    self.v6_prefix = "2001:700:0.8068::"
+  def __init__(self, v6_prefix):
+    self.v6_prefix = v6_prefix
 
 
   def add_client(self,ip,user):
@@ -15,11 +16,11 @@ class wall():
     self.del_client(ip)
     for way in ['-d','-s']:
       command = '-A ALLOWED %s %s -j ACCEPT -m comment --comment %s' %(way,ip,user)
-      if ver == 4: 
+      if ver == 4:
         scall('/sbin/iptables %s' %command)
         scall('/sbin/iptables -t nat %s' %command)
         self.add_client(self,self.v6_prefix+ip.split('.')[3],user)
-      elif ver == 6: 
+      elif ver == 6:
         scall('/sbin/ip6tables %s'%command)
         scall('/sbin/ip6tables -t nat %s'%command)
       scall("iptables-save > /var/www/html/active")
@@ -27,10 +28,10 @@ class wall():
   def add_custom(self,rule):
     for word in rule.split():
       ver = self.get_IPv(word)
-      if ver == 4: 
+      if ver == 4:
         scall('/sbin/iptables %s' %rule)
 	break
-      elif ver == 6: 
+      elif ver == 6:
         scall('/sbin/ip6tables %s' %rule)
 	break
 
@@ -42,42 +43,42 @@ class wall():
     command = ''
     ver = self.get_IPv(ip)
     for rule in self.get_rules(ver):
-      if ip in rule: 
+      if ip in rule:
         command = rule.replace('-A','-D')
-        if ver == 4: 
+        if ver == 4:
           scall('/sbin/iptables %s' %command)
           scall('/sbin/iptables -t nat %s' %command)
           self.del_client(self,self.v6_prefix+ip.split('.')[3])
-        elif ver == 6: 
+        elif ver == 6:
           scall('/sbin/ip6tables %s'%command)
           scall('/sbin/ip6tables -t nat %s'%command)
 
         scall("iptables-save > /var/www/html/active")
-      
 
-  def get_rules(self,ver):	
+
+  def get_rules(self,ver):
     out = ''
-    rules = '' 
+    rules = ''
     if ver == 4: rules = scheck("/sbin/iptables-save")
     elif ver == 6: rules = scheck("/sbin/ip6tables-save")
     rules = rules.split('*filter')[1]
     for rules in rules.split('\n'):
       if 'ALLOWED' in rules and not '[0:0]' in rules: out += rules+"; "
- 
+
     out = out.split(';')
     out = out[:len(out)-1]
 
-    return out 
+    return out
 
   def get_ns(self,data):
     ver = self.get_IPv(data)
     out = ''
     try:
-      if ver > 0: return scheck('host %s' %data).split()[-1]  
+      if ver > 0: return scheck('host %s' %data).split()[-1]
       elif ver == -1:
         for line in scheck('host %s' %data).split('\n'):
-	  if line and not 'mail' in line: out += line.split()[-1]+' ' 
-    except Exception, e: print e 
+	  if line and not 'mail' in line: out += line.split()[-1]+' '
+    except Exception, e: print e
     return out.split()
 
   def add_client_from_ns(self,address):
@@ -87,4 +88,3 @@ class wall():
 
 
 
-wall = wall()

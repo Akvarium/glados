@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import socket, ipaddr, hashlib, json, time, dns.query, dns.update
-from wall import wall
+from self.wall.import wall
+from ConfigParser import SafeConfigParser
 adminHash = hashlib.sha224("nijet").hexdigest()
 
 class tower():
@@ -8,19 +9,22 @@ class tower():
   def __init__(self,port):
     self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     self.sock.bind(('',port))
-    self.logfile = open('/var/log/tower.log', 'a') 
-    self.allowed = "158.38.48.3 158.38.48.10 127.0.0.1"
-    self.zone = "lan.tihlde.org"
-    self.dns_server = "158.38.48.10"
+    parser = SafeConfigParser()
+    parser.read('/etc/glados.conf')
+    self.self.wall.= wall(parser.read('global','ipv6_prefix')
+    self.logfile = open(parser.get('global','logfile')
+    self.allowed = parser.get('global','allowed_net')
+    self.zone = parser.get('global','dns_zone')
+    self.dns_server = parser.get('global','dns_server')
 
   def listen(self):
-    running = True 
+    running = True
     while running:
       data, addr = self.sock.recvfrom(1024)
       if self.is_accepted(addr, data):
         self.command(addr, data.replace('\n',''))
       else: self.log(addr, data.replace('\n',''), 'No Acces!')
-       
+
   def is_accepted(self,addr, data):
     if addr[0] in self.allowed: return True
     else: return False
@@ -32,21 +36,21 @@ class tower():
 
 
   def command(self,addr,data):
-    if len(data.split()) == 3 and wall.get_IPv(data.split()[2]) > 0:
-      if 'add' in data: 
-        wall.add_client(data.split()[2],data.split()[1]) 
+    if len(data.split()) == 3 and self.wall.get_IPv(data.split()[2]) > 0:
+      if 'add' in data:
+        self.wall.add_client(data.split()[2],data.split()[1])
         self.log(addr,data,'Add')
-        self.add_dns(self.zone,data.split()[1],data.split()[2]) 
+        self.add_dns(self.zone,data.split()[1],data.split()[2])
       if 'del' in data:
         self.del_dns(self.zone,data.split()[1],data.split()[2])
 	self.log(addr,data,'del')
-        wall.del_client(data.split()[2])
+        self.wall.del_client(data.split()[2])
 
     if 'rules' in data:
-      self.log(addr,wall.get_rules(int(data.split()[1])),'rules')
+      self.log(addr,self.wall.get_rules(int(data.split()[1])),'rules')
 
   def add_dns(self,zone,user,ip):
-    ver = wall.get_IPv(ip)
+    ver = self.wall.get_IPv(ip)
     update = dns.update.Update(zone)
     code = 'A'
     if ver == 6: return "noIpv6"
@@ -55,7 +59,7 @@ class tower():
 
   def del_dns(self,zone,host,IP):
      try:
-       if host == 'dhcp': host = self.get_user(IP) 
+       if host == 'dhcp': host = self.get_user(IP)
      except Exception, e: print e
      print host
      update = dns.update.Update(zone)
@@ -63,18 +67,11 @@ class tower():
      return dns.query.tcp(update, self.dns_server)
 
   def get_user(self,IP):
-    ipt = wall.get_rules(4)
+    ipt = self.wall.get_rules(4)
     print ipt
     for x in ipt:
       print x
       if IP in x: return x.split()[7]
     return "DeletedSomthingThatWasRemowed??"
-    
-     
-
-      
 
 
-tower = tower(5000)
-
-tower.listen()
