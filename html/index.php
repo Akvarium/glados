@@ -11,7 +11,7 @@
 $IP=$_SERVER['REMOTE_ADDR'];
 $img="ipfire_tux_256x256.png";
 $ADMPORT=5000;
-$ADMIP="158.38.48.3";
+$ADMIP="10.254.12.59";
 $msg="";
 
 $sock = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);

@@ -7,7 +7,7 @@ scall = partial(call, shell=True)
 scheck = partial(check_output, shell=True)
 
 class wall():
-
+    self.v6_prefix = "2001:700:0.8068::"
 
 
   def add_client(self,ip,user):
@@ -18,6 +18,7 @@ class wall():
       if ver == 4: 
         scall('/sbin/iptables %s' %command)
         scall('/sbin/iptables -t nat %s' %command)
+        self.add_client(self,self.v6_prefix+ip.split('.')[3],user)
       elif ver == 6: 
         scall('/sbin/ip6tables %s'%command)
         scall('/sbin/ip6tables -t nat %s'%command)
@@ -46,6 +47,7 @@ class wall():
         if ver == 4: 
           scall('/sbin/iptables %s' %command)
           scall('/sbin/iptables -t nat %s' %command)
+          self.del_client(self,self.v6_prefix+ip.split('.')[3])
         elif ver == 6: 
           scall('/sbin/ip6tables %s'%command)
           scall('/sbin/ip6tables -t nat %s'%command)
