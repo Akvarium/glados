@@ -9,7 +9,7 @@ setup(name='glados',
     author_email='sveinov@uninett.no',
     url='http://tihlde.org/sveinou/glados.git',
     py_modules = ['wall','tower'],
-    scripts=['bin/*'],
+    scripts=['bin/lan'],
     data_files=[('/etc/dhcp/', ['dhcpd.conf']),
-               [('/var/www/html/'['html/*']),
-)
+               ('/var/www/html/', ['html/*.*']),]
+    )
