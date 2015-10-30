@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import socket, ipaddr, hashlib, json, time, dns.query, dns.update
-from self.wall.import wall
+from wall import wall
 from ConfigParser import SafeConfigParser
 adminHash = hashlib.sha224("nijet").hexdigest()
 
