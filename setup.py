@@ -9,7 +9,8 @@ setup(name='glados',
     author_email='sveinov@uninett.no',
     url='http://tihlde.org/sveinou/glados.git',
     py_modules = ['wall','tower'],
-    scripts=['bin/lan'],
+    scripts=['bin/lan','bin/startlan','bin/startlan6','bin/flushlan'],
     data_files=[('/etc/dhcp/', ['dhcpd.conf']),
-	       ('/etc/',['glados.conf']),]
+	       ('/etc/',['glados.conf']),
+	       ('/var/log/',['tower.log']),]
     )

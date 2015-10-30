@@ -1,0 +1,22 @@
+#!/bin/bash
+
+IPADDR=$1
+
+#ip6tables -F
+#ip6tables -t nat -F
+ip6tables -N ALLOWED
+ip6tables -t nat -N ALLOWED
+#ip6tables -F ALLOWED
+ip6tables -t nat -F ALLOWED
+ip6tables -A FORWARD -p tcp --syn -m connlimit --connlimit-above 1000 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
+ip6tables -A FORWARD -p udp -m multiport --ports 53 -j ACCEPT
+ip6tables -A FORWARD -j ALLOWED
+#ip6tables -t nat -A PREROUTING -j ALLOWED
+#ip6tables -t nat -A PREROUTING -p tcp -m multiport --ports 80,443 -j DNAT --to-destination [$IPADDR]:80
+ip6tables -A FORWARD -d $IPADDR -p tcp -m multiport --ports 80,443 -j ACCEPT
+ip6tables -A FORWARD -j DROP
+
+#ip6tables -A POSTROUTING -t nat -o eth1:1 -j MASQUERADE
+
+ip6tables-save > /var/www/html/active
+

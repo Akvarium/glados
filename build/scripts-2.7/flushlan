@@ -1,0 +1,12 @@
+#!/bin/bash
+
+
+/sbin/iptables -F
+/sbin/iptables -t nat -F
+/sbin/iptables -F ALLOWED 
+/sbin/iptables -t nat -F ALLOWED
+
+/sbin/ip6tables -F
+/sbin/ip6tables -t nat -F
+/sbin/ip6tables -F ALLOWED 
+/sbin/ip6tables -t nat -F ALLOWED
