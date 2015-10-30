@@ -10,5 +10,6 @@ setup(name='glados',
     url='http://tihlde.org/sveinou/glados.git',
     py_modules = ['wall','tower'],
     scripts=['bin/lan'],
-    data_files=[('/etc/dhcp/', ['dhcpd.conf']),]
+    data_files=[('/etc/dhcp/', ['dhcpd.conf']),
+	       ('/etc/',['glados.conf']),]
     )
