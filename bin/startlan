@@ -2,12 +2,8 @@
 
 IPADDR=$1
 
-#iptables -F
-#iptables -t nat -F
 iptables -N ALLOWED
 iptables -t nat -N ALLOWED
-#iptables -F ALLOWED
-#iptables -t nat -F ALLOWED
 iptables -A FORWARD -p tcp --syn -m connlimit --connlimit-above 1000 --connlimit-mask 32 -j REJECT --reject-with tcp-reset
 iptables -A FORWARD -p udp -m multiport --ports 53 -j ACCEPT
 iptables -A FORWARD -j ALLOWED
@@ -16,7 +12,7 @@ iptables -t nat -A PREROUTING -p tcp -m multiport --ports 80,443 -j DNAT --to-de
 iptables -A FORWARD -d $IPADDR -p tcp -m multiport --ports 80,443 -j ACCEPT
 iptables -A FORWARD -j DROP
 
-#iptables -A POSTROUTING -t nat -o eth1:1 -j MASQUERADE
+sysctl -w net.ipv4.ip_forward=1
 
 iptables-save > /var/www/html/active
 

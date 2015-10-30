@@ -9,7 +9,7 @@
 
 <?php
 $IP=$_SERVER['REMOTE_ADDR'];
-$img="ipfire_tux_256x256.png";
+$img="ipfire.png";
 $ADMPORT=5000;
 $ADMIP="10.254.12.59";
 $msg="";

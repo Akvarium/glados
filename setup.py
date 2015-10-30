@@ -13,5 +13,5 @@ setup(name='glados',
     data_files=[('/etc/dhcp/', ['dhcpd.conf']),
 	       ('/etc/',['glados.conf']),
 	       ('/var/log/',['tower.log']),
-	       ('/var/www/html/',['html/*.png','html/*.gif','html/index.php','html/*.py']),]
+	       ('/var/www/html/',['html/1336.png','html/IzUaG.gif','html/ipfire.png','html/worldTux.png','html/index.php','html/pam.py','auth.py']),]
     )
